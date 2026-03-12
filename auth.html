@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Вход — Педагогический портал СКО</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Sora:wght@300;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;font-family:'Nunito',sans-serif;background:#000e2a;color:#fff;overflow-x:hidden}
+
+/* ── BG ── */
+.bg-scene{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#000e2a,#001840 40%,#002255 70%,#001030);overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(65px);opacity:.3;animation:orb-drift linear infinite}
+.orb-1{width:500px;height:500px;background:radial-gradient(circle,#1565c0,transparent);top:-120px;left:-100px;animation-duration:20s}
+.orb-2{width:400px;height:400px;background:radial-gradient(circle,#003399,transparent);bottom:-80px;right:-80px;animation-duration:25s;animation-direction:reverse}
+.orb-3{width:300px;height:300px;background:radial-gradient(circle,#c8a04055,transparent);top:35%;left:55%;animation-duration:30s}
+@keyframes orb-drift{0%{transform:translate(0,0)scale(1)}33%{transform:translate(28px,-18px)scale(1.07)}66%{transform:translate(-18px,28px)scale(.93)}100%{transform:translate(0,0)scale(1)}}
+.grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(25,118,210,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(25,118,210,.05) 1px,transparent 1px);background-size:60px 60px}
+#stars{position:absolute;inset:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.06}50%{opacity:.5}}
+
+/* ── LAYOUT ── */
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px}
+
+/* ── CARD ── */
+.auth-card{background:rgba(255,255,255,.055);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.11);border-radius:30px;padding:38px 36px 32px;width:100%;max-width:440px;box-shadow:0 40px 100px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1);animation:card-rise .65s cubic-bezier(.34,1.46,.64,1) both;position:relative;overflow:hidden}
+@keyframes card-rise{from{opacity:0;transform:translateY(36px)scale(.95)}to{opacity:1;transform:none}}
+.card-shine{position:absolute;top:0;left:-220%;width:220%;height:100%;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.055) 50%,transparent 62%);animation:shine 5s ease-in-out infinite;pointer-events:none}
+@keyframes shine{0%{left:-220%}25%,100%{left:220%}}
+
+/* ── APP ICON ── */
+.app-icon-wrap{text-align:center;margin-bottom:20px}
+.app-icon{width:82px;height:82px;margin:0 auto 14px;background:linear-gradient(135deg,#003d82,#1976D2);border-radius:24px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 0 0 rgba(25,118,210,.5),0 12px 40px rgba(0,51,102,.55);animation:icon-pulse 3s ease-in-out infinite}
+@keyframes icon-pulse{0%,100%{box-shadow:0 0 0 0 rgba(25,118,210,.4),0 12px 40px rgba(0,51,102,.55)}50%{box-shadow:0 0 0 14px rgba(25,118,210,0),0 12px 40px rgba(0,51,102,.6)}}
+.app-icon svg{width:50px;height:50px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+.app-icon-badge{position:absolute;top:-6px;right:-6px;width:26px;height:26px;background:linear-gradient(135deg,#c8a040,#f0c040);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 10px rgba(200,160,64,.6);border:2px solid rgba(0,20,60,.5);animation:badge-spin 6s linear infinite}
+@keyframes badge-spin{to{transform:rotate(360deg)}}
+.app-icon-wrap h1{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;line-height:1.3;margin-bottom:3px}
+.app-icon-wrap p{font-size:11px;color:rgba(255,255,255,.38);font-weight:700;letter-spacing:.6px}
+
+/* ── STEPS INDICATOR ── */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:24px}
+.step-dot{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.35);transition:all .3s;flex-shrink:0}
+.step-dot.active{background:linear-gradient(135deg,#003366,#1976D2);border-color:transparent;color:#fff;box-shadow:0 4px 16px rgba(0,51,102,.5)}
+.step-dot.done{background:linear-gradient(135deg,#16a34a,#22c55e);border-color:transparent;color:#fff}
+.step-dot.done::after{content:'✓'}
+.step-dot.active span,.step-dot:not(.done):not(.active) span{display:block}
+.step-dot.done span{display:none}
+.step-line{width:32px;height:2px;background:rgba(255,255,255,.1);transition:background .3s;flex-shrink:0}
+.step-line.done{background:linear-gradient(90deg,#22c55e,#1976D2)}
+.step-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.35);text-align:center;margin-bottom:20px;letter-spacing:.4px;transition:color .3s}
+
+/* ── TABS (for login vs register) ── */
+.auth-tabs{display:flex;gap:4px;background:rgba(0,0,0,.22);border-radius:17px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;padding:10px 8px;border:none;background:transparent;color:rgba(255,255,255,.45);border-radius:14px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:all .25s}
+.auth-tab.active{background:linear-gradient(135deg,#003366,#1976D2);color:#fff;box-shadow:0 4px 16px rgba(0,51,102,.5)}
+
+/* ── PANELS ── */
+.auth-panel{display:none}
+.auth-panel.active{display:block;animation:panel-in .3s ease both}
+@keyframes panel-in{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+
+/* ── STEP PANELS ── */
+.step-panel{display:none}
+.step-panel.active{display:block;animation:panel-in .3s ease both}
+
+/* ── FIELD ── */
+.field-group{margin-bottom:14px;position:relative}
+.field-label{display:block;font-size:10px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.9px;text-transform:uppercase;margin-bottom:6px}
+.field-input{width:100%;padding:12px 42px 12px 15px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:13px;color:#fff;font-family:inherit;font-size:14px;outline:none;transition:all .2s}
+.field-input::placeholder{color:rgba(255,255,255,.2)}
+.field-input:focus{border-color:#1976D2;background:rgba(25,118,210,.1);box-shadow:0 0 0 4px rgba(25,118,210,.12)}
+.field-input.error{border-color:#ef4444!important;background:rgba(239,68,68,.08)!important}
+.field-input.ok{border-color:#22c55e!important}
+/* show/hide password toggle */
+.eye-btn{position:absolute;right:13px;bottom:11px;background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:18px;padding:2px;transition:color .2s;line-height:1}
+.eye-btn:hover{color:rgba(255,255,255,.7)}
+
+/* ── PASSWORD STRENGTH ── */
+.pwd-strength{margin:-6px 0 12px}
+.pwd-bars{display:flex;gap:4px;margin-bottom:4px}
+.pwd-bar{height:3px;flex:1;border-radius:2px;background:rgba(255,255,255,.09);transition:background .28s}
+.pwd-hint{font-size:10px;color:rgba(255,255,255,.3);font-weight:700}
+
+/* ── PIN ── */
+.pin-label{display:block;font-size:10px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.9px;text-transform:uppercase;margin-bottom:12px}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:14px}
+.pin-dot{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.22);background:transparent;transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+.pin-dot.filled{background:linear-gradient(135deg,#c8a040,#f0c040);border-color:transparent;box-shadow:0 0 14px rgba(200,160,64,.6);transform:scale(1.25)}
+.pin-dot.err{background:#ef4444;border-color:transparent;box-shadow:0 0 14px rgba(239,68,68,.6)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:4px}
+.np-btn{width:100%;aspect-ratio:1.55/1;background:rgba(255,255,255,.068);border:1px solid rgba(255,255,255,.1);border-radius:13px;color:#fff;font-family:'Sora',sans-serif;font-size:18px;font-weight:700;cursor:pointer;transition:all .14s;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.np-btn sub{font-size:7px;color:rgba(255,255,255,.32);letter-spacing:.3px;margin-top:-2px}
+.np-btn:hover{background:rgba(25,118,210,.22);border-color:rgba(25,118,210,.4);transform:translateY(-2px)}
+.np-btn:active{transform:scale(.91)}
+.np-btn.del{font-size:17px;color:rgba(255,255,255,.45)}
+.np-btn.del:hover{color:#ef4444;border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.09)}
+.np-ph{visibility:hidden;pointer-events:none}
+.np-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.18);transform:scale(0);animation:rip .4s ease;pointer-events:none}
+@keyframes rip{to{transform:scale(4.5);opacity:0}}
+.pin-note{font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:7px;line-height:1.5}
+
+/* ── MSG ── */
+.auth-msg{padding:10px 14px;border-radius:12px;font-size:13px;font-weight:700;margin-bottom:12px;display:none}
+.auth-msg.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5;display:block;animation:msg-pop .25s cubic-bezier(.34,1.56,.64,1)}
+.auth-msg.success{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);color:#86efac;display:block;animation:msg-pop .25s cubic-bezier(.34,1.56,.64,1)}
+.auth-msg.info{background:rgba(25,118,210,.12);border:1px solid rgba(25,118,210,.35);color:#93c5fd;display:block;animation:msg-pop .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes msg-pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ── SUBMIT ── */
+.auth-submit{width:100%;padding:14px;background:linear-gradient(135deg,#003366,#1976D2);border:none;border-radius:15px;color:#fff;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 6px 24px rgba(0,51,102,.4);position:relative;overflow:hidden;margin-top:6px}
+.auth-submit:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,51,102,.52)}
+.auth-submit:active{transform:scale(.97)}
+.auth-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-spinner{display:none;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-submit.loading .btn-text{display:none}
+.auth-submit.loading .btn-spinner{display:block}
+
+/* ── BACK STEP ── */
+.step-back{background:none;border:none;color:rgba(255,255,255,.35);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;padding:6px 0;transition:color .2s;display:flex;align-items:center;gap:5px;margin-bottom:14px}
+.step-back:hover{color:rgba(255,255,255,.7)}
+
+/* ── SUCCESS ── */
+.auth-success{text-align:center;padding:10px 0;display:none}
+.auth-success.show{display:block;animation:card-rise .5s cubic-bezier(.34,1.46,.64,1)}
+.success-circle{width:82px;height:82px;margin:0 auto 18px;background:linear-gradient(135deg,#16a34a,#22c55e);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;animation:s-pop .5s cubic-bezier(.34,1.56,.64,1) both,s-glow 2.2s 1s ease-in-out infinite}
+@keyframes s-pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes s-glow{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 18px rgba(34,197,94,0)}}
+.auth-success h2{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:6px}
+.auth-success p{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px}
+.go-btn{display:inline-block;padding:13px 38px;background:linear-gradient(135deg,#003366,#1976D2);color:#fff;border:none;border-radius:15px;font-family:inherit;font-size:14px;font-weight:900;text-decoration:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,51,102,.4);transition:all .2s}
+.go-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,51,102,.52)}
+
+/* ── DB BADGE ── */
+.db-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:rgba(255,255,255,.3);margin-bottom:16px;padding:4px 11px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:20px}
+.db-dot{width:7px;height:7px;border-radius:50%;background:#64748b;animation:db-pulse 2s ease-in-out infinite}
+.db-dot.online{background:#22c55e}
+.db-dot.offline{background:#f59e0b}
+@keyframes db-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── SHAKE ── */
+@keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+
+/* ── USERS FOOTER ── */
+.users-footer{margin-top:18px;padding-top:13px;border-top:1px solid rgba(255,255,255,.07);display:none}
+.uf-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.5px;text-align:center;margin-bottom:8px}
+.users-avs{display:flex;justify-content:center}
+.u-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#00266a,#1976D2);border:2px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;margin-left:-5px;cursor:default;transition:transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.u-av:first-child{margin-left:0}
+.u-av:hover{transform:translateY(-3px)}
+.u-av-more{background:rgba(255,255,255,.09);font-size:9px;color:rgba(255,255,255,.45)}
+
+@media(max-width:460px){.auth-card{padding:26px 18px 24px}.np-btn{font-size:16px}.app-icon{width:70px;height:70px}}
+.field-hint{font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;padding-left:2px;}
+</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1976d2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Навигатор">
+<link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+
+<div class="bg-scene">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+  <div class="grid-lines"></div><div id="stars"></div>
+</div>
+
+<div class="page">
+<div class="auth-card">
+  <div class="card-shine"></div>
+
+  <!-- ICON -->
+  <div class="app-icon-wrap" id="auth-logo">
+    <div class="app-icon">
+      <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 14C8 12.9 8.9 12 10 12H24V40H10C8.9 40 8 39.1 8 38V14Z" fill="rgba(255,255,255,0.92)"/>
+        <path d="M44 14C44 12.9 43.1 12 42 12H28V40H42C43.1 40 44 39.1 44 38V14Z" fill="rgba(255,255,255,0.75)"/>
+        <rect x="24" y="12" width="4" height="28" fill="rgba(255,255,255,0.5)"/>
+        <rect x="11" y="19" width="11" height="1.5" rx=".75" fill="rgba(25,118,210,0.6)"/>
+        <rect x="11" y="23" width="9" height="1.5" rx=".75" fill="rgba(25,118,210,0.5)"/>
+        <rect x="11" y="27" width="10" height="1.5" rx=".75" fill="rgba(25,118,210,0.5)"/>
+        <rect x="11" y="31" width="8" height="1.5" rx=".75" fill="rgba(25,118,210,0.4)"/>
+        <rect x="29" y="19" width="11" height="1.5" rx=".75" fill="rgba(25,118,210,0.5)"/>
+        <rect x="29" y="23" width="9" height="1.5" rx=".75" fill="rgba(25,118,210,0.4)"/>
+        <rect x="29" y="27" width="10" height="1.5" rx=".75" fill="rgba(25,118,210,0.4)"/>
+        <path d="M40 7L41.12 9.88L44 11L41.12 12.12L40 15L38.88 12.12L36 11L38.88 9.88L40 7Z" fill="#f0c040"/>
+        <path d="M12 8L12.75 9.88L14.5 10.5L12.75 11.12L12 13L11.25 11.12L9.5 10.5L11.25 9.88L12 8Z" fill="rgba(255,255,255,0.7)"/>
+      </svg>
+      <div class="app-icon-badge">✦</div>
+    </div>
+    <h1>Цифровой навигатор педагога</h1>
+    <p>ПЕТРОПАВЛОВСК · СКО</p>
+  </div>
+
+  <!-- DB STATUS -->
+  <div style="text-align:center">
+    <div class="db-badge" id="db-badge">
+      <div class="db-dot" id="db-dot"></div>
+      <span id="db-status-text">Подключение...</span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="auth-tabs" id="auth-tabs">
+    <button class="auth-tab active" onclick="switchMode('login')" id="tab-login">🔑 Войти</button>
+    <button class="auth-tab" onclick="switchMode('register')" id="tab-register">✨ Регистрация</button>
+  </div>
+
+  <!-- ═══════════ LOGIN MODE ═══════════ -->
+  <div class="auth-panel active" id="panel-login">
+
+    <!-- STEP 1: login + password -->
+    <div class="step-panel active" id="login-step1">
+      <div id="msg-login" class="auth-msg"></div>
+      <div class="field-group">
+        <label class="field-label">Логин</label>
+        <input id="login-name" type="text" class="field-input" placeholder="Ваш логин" autocomplete="username"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Пароль</label>
+        <input id="login-pwd" type="password" class="field-input" placeholder="Введите пароль" autocomplete="current-password"/>
+        <button type="button" class="eye-btn" onclick="toggleEye('login-pwd',this)">👁</button>
+      </div>
+      <button class="auth-submit" id="btn-login-step1" onclick="loginStep1()">
+        <span class="btn-text">Далее →</span><span class="btn-spinner"></span>
+      </button>
+    </div>
+
+    <!-- STEP 2: PIN -->
+    <div class="step-panel" id="login-step2">
+      <button class="step-back" onclick="backToStep('login',1)">← Назад</button>
+      <div id="msg-login-pin" class="auth-msg"></div>
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:13px;color:rgba(255,255,255,.55);margin-bottom:4px">Добро пожаловать,</div>
+        <div id="login-welcome-name" style="font-size:18px;font-weight:900;color:#fff"></div>
+      </div>
+      <span class="pin-label" style="text-align:center;display:block">Введите PIN-код</span>
+      <div class="pin-dots" id="login-pin-dots">
+        <div class="pin-dot"></div><div class="pin-dot"></div>
+        <div class="pin-dot"></div><div class="pin-dot"></div>
+      </div>
+      <div class="numpad" id="login-numpad"></div>
+      <button class="auth-submit" id="btn-login-step2" onclick="loginStep2()">
+        <span class="btn-text">Войти в портал 🏫</span><span class="btn-spinner"></span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ REGISTER MODE ═══════════ -->
+  <div class="auth-panel" id="panel-register">
+
+    <!-- STEP 1: login + password -->
+    <div class="step-panel active" id="reg-step1">
+      <div id="msg-reg" class="auth-msg"></div>
+      <div class="field-group">
+        <label class="field-label">Придумайте логин <span style="color:#8b949e;font-weight:400">(для входа)</span></label>
+        <input id="reg-name" type="text" class="field-input" placeholder="Напр.: aigul_m" maxlength="30" autocomplete="username" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_.-]/g,'')"/>
+        <div class="field-hint">Только латиница, цифры, _ . -</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Ваше имя <span style="color:#8b949e;font-weight:400">(отображается в чате)</span></label>
+        <input id="reg-display-name" type="text" class="field-input" placeholder="Напр.: Айгуль М." maxlength="30" autocomplete="off"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Придумайте пароль</label>
+        <input id="reg-pwd" type="password" class="field-input" placeholder="Минимум 6 символов" autocomplete="new-password" oninput="checkPwdStrength(this.value)"/>
+        <button type="button" class="eye-btn" onclick="toggleEye('reg-pwd',this)">👁</button>
+      </div>
+      <div class="pwd-strength" id="pwd-strength" style="display:none">
+        <div class="pwd-bars">
+          <div class="pwd-bar" id="pb0"></div><div class="pwd-bar" id="pb1"></div>
+          <div class="pwd-bar" id="pb2"></div><div class="pwd-bar" id="pb3"></div>
+        </div>
+        <div class="pwd-hint" id="pwd-hint"></div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Повторите пароль</label>
+        <input id="reg-pwd2" type="password" class="field-input" placeholder="Ещё раз пароль" autocomplete="new-password"/>
+        <button type="button" class="eye-btn" onclick="toggleEye('reg-pwd2',this)">👁</button>
+      </div>
+      <button class="auth-submit" id="btn-reg-step1" onclick="regStep1()">
+        <span class="btn-text">Далее — создать PIN →</span><span class="btn-spinner"></span>
+      </button>
+    </div>
+
+    <!-- STEP 2: PIN creation -->
+    <div class="step-panel" id="reg-step2">
+      <button class="step-back" onclick="backToStep('register',1)">← Назад</button>
+      <div id="msg-reg-pin" class="auth-msg"></div>
+      <span class="pin-label" style="text-align:center;display:block">Придумайте PIN-код (4 цифры)</span>
+      <div class="pin-dots" id="reg-pin-dots">
+        <div class="pin-dot"></div><div class="pin-dot"></div>
+        <div class="pin-dot"></div><div class="pin-dot"></div>
+      </div>
+      <div style="display:flex;gap:4px;justify-content:center;margin:5px 0 12px">
+        <div class="pwd-bar" id="pp0"></div><div class="pwd-bar" id="pp1"></div>
+        <div class="pwd-bar" id="pp2"></div><div class="pwd-bar" id="pp3"></div>
+      </div>
+      <div class="numpad" id="reg-numpad"></div>
+      <div class="pin-note">⚠ Запомните PIN — нужен при каждом входе</div>
+      <button class="auth-submit" id="btn-reg-step2" onclick="regStep2()" style="margin-top:16px">
+        <span class="btn-text">Зарегистрироваться ✦</span><span class="btn-spinner"></span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="auth-success" id="success-screen">
+    <div class="success-circle" id="s-icon">✓</div>
+    <h2 id="s-title">Добро пожаловать!</h2>
+    <p id="s-sub">Перенаправление...</p>
+    <a href="index.html" class="go-btn">🏫 На главную</a>
+  </div>
+
+  <!-- USERS FOOTER -->
+  <div class="users-footer" id="users-footer">
+    <div class="uf-label" id="uf-label">Педагогов в системе</div>
+    <div class="users-avs" id="users-avs"></div>
+  </div>
+
+</div>
+</div>
+
+<script src="session.js"></script>
+<script src="security.js"></script>
+<script>
+/* ══ SUPABASE ══ */
+const SB_URL  = 'https://ljtogliylpubvkckpwyv.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdG9nbGl5bHB1YnZrY2twd3l2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxNzEzODQsImV4cCI6MjA4ODc0NzM4NH0.91EQ_EEfi8X09Vm0jmH12_35R6tf0BwtTGoX3K5lgfc';
+// SESSION_KEY удалён — используем session.js
+
+/* ── Stars ── */
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<85;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2.4+.4;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${1.8+Math.random()*4}s;animation-delay:${Math.random()*5}s`;
+    c.appendChild(s);
+  }
+})();
+
+/* ── DB Status ── */
+async function checkDb(){
+  const dot=document.getElementById('db-dot'),txt=document.getElementById('db-status-text');
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/pedagog_users?select=id&limit=1`,{headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});
+    if(r.ok||r.status===406){dot.className='db-dot online';txt.textContent='База данных подключена';}
+    else throw new Error();
+  }catch(e){dot.className='db-dot offline';txt.textContent='Нет подключения к БД';}
+}
+checkDb();
+
+/* ── Supabase helper ── */
+async function sbFetch(path,opts={}){
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,
+      'Content-Type':'application/json','Prefer':'return=representation',...(opts.headers||{})},
+    ...opts
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.message||res.statusText);}
+  return res.json().catch(()=>null);
+}
+
+/* ── SHA-256 hash ── */
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('pedagog_sko_2025_'+str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ── State ── */
+const state = { mode:'login', loginUser:null };
+const pins  = { login:'', register:'' };
+
+/* ══ MODE SWITCH ══ */
+function switchMode(mode){
+  state.mode = mode;
+  ['login','register'].forEach(m=>{
+    document.getElementById('tab-'+m).classList.toggle('active', m===mode);
+    document.getElementById('panel-'+m).classList.toggle('active', m===mode);
+  });
+  // Reset steps
+  goToStep('login',1); goToStep('register',1);
+  clearMsg('login'); clearMsg('reg'); clearMsg('login-pin'); clearMsg('reg-pin');
+  pins.login=''; pins.register='';
+  renderDots('login'); renderDots('register');
+}
+
+/* ══ STEP NAVIGATION ══ */
+function goToStep(mode, step){
+  const prefix = mode==='login' ? 'login' : 'reg';
+  document.querySelectorAll(`#panel-${mode} .step-panel`).forEach((p,i)=>{
+    p.classList.toggle('active', i+1===step);
+  });
+}
+function backToStep(mode,step){ goToStep(mode,step); }
+
+/* ══ PASSWORD STRENGTH ══ */
+function checkPwdStrength(pwd){
+  const el=document.getElementById('pwd-strength');
+  if(!pwd){el.style.display='none';return;}
+  el.style.display='';
+  let score=0;
+  if(pwd.length>=6) score++;
+  if(pwd.length>=10) score++;
+  if(/[A-ZА-Я]/.test(pwd)||/[0-9]/.test(pwd)) score++;
+  if(/[^a-zA-Zа-яА-Я0-9]/.test(pwd)) score++;
+  const colors=['#ef4444','#f59e0b','#3b82f6','#22c55e'];
+  const labels=['Слабый','Средний','Хороший','Надёжный'];
+  for(let i=0;i<4;i++) document.getElementById('pb'+i).style.background=i<score?colors[score-1]:'rgba(255,255,255,.09)';
+  document.getElementById('pwd-hint').textContent=labels[score-1]||'';
+  document.getElementById('pwd-hint').style.color=colors[score-1]||'#888';
+}
+
+/* ══ EYE TOGGLE ══ */
+function toggleEye(inputId,btn){
+  const inp=document.getElementById(inputId);
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.textContent=show?'🙈':'👁';
+}
+
+/* ══ PIN NUMPAD ══ */
+const NUM_LABELS={'2':'АБВ','3':'ГДЕ','4':'ЖЗИ','5':'КЛМ','6':'НОП','7':'РСТ','8':'УФХ','9':'ЦЧШ'};
+function buildNumpad(padId, pinKey){
+  const pad=document.getElementById(padId);
+  if(!pad||pad.children.length) return;
+  ['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(k=>{
+    const btn=document.createElement('button');
+    if(!k){btn.className='np-btn np-ph';btn.disabled=true;pad.appendChild(btn);return;}
+    btn.className='np-btn'+(k==='⌫'?' del':'');
+    btn.innerHTML=k==='⌫'?'⌫':k+(NUM_LABELS[k]?`<sub>${NUM_LABELS[k]}</sub>`:'');
+    btn.addEventListener('click',e=>{
+      k==='⌫'?updPin(pinKey,'del'):updPin(pinKey,k);
+      const r=document.createElement('span');r.className='np-ripple';
+      const rect=btn.getBoundingClientRect(),sz=Math.max(rect.width,rect.height);
+      r.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px`;
+      btn.appendChild(r);setTimeout(()=>r.remove(),450);
+    });
+    pad.appendChild(btn);
+  });
+}
+buildNumpad('login-numpad','login');
+buildNumpad('reg-numpad','register');
+
+function updPin(key,action){
+  clearMsg(key==='login'?'login-pin':'reg-pin');
+  if(action==='del') pins[key]=pins[key].slice(0,-1);
+  else if(pins[key].length<4) pins[key]+=action;
+  renderDots(key);
+  if(key==='register') updPinStrength(pins[key]);
+}
+function renderDots(key){
+  const id=key==='login'?'login-pin-dots':'reg-pin-dots';
+  document.getElementById(id).querySelectorAll('.pin-dot').forEach((d,i)=>{
+    d.classList.toggle('filled',i<pins[key].length);d.classList.remove('err');
+  });
+}
+function shakeDots(key){
+  const id=key==='login'?'login-pin-dots':'reg-pin-dots';
+  const el=document.getElementById(id);
+  el.querySelectorAll('.pin-dot').forEach(d=>{d.classList.add('err');d.classList.remove('filled');});
+  el.style.animation='shake .36s ease';
+  setTimeout(()=>{el.style.animation='';pins[key]='';renderDots(key);},380);
+}
+function updPinStrength(pin){
+  const colors=['transparent','#ef4444','#f59e0b','#22c55e'];
+  for(let i=0;i<4;i++) document.getElementById('pp'+i).style.background=i<pin.length?colors[Math.min(pin.length,3)]:'rgba(255,255,255,.09)';
+}
+
+/* ══ MESSAGES ══ */
+function showMsg(id,type,txt){const el=document.getElementById('msg-'+id);if(!el)return;el.className='auth-msg '+type;el.textContent=(type==='error'?'⚠ ':type==='success'?'✓ ':'ℹ ')+txt;}
+function clearMsg(id){const el=document.getElementById('msg-'+id);if(el){el.className='auth-msg';el.textContent='';}}
+function setLoading(id,on){const b=document.getElementById(id);if(!b)return;b.classList.toggle('loading',on);b.disabled=on;}
+
+/* ══ DB OPERATIONS ══ */
+async function dbFindUser(name){
+  const nameFilter=name.replace(/[%&=+]/g,c=>encodeURIComponent(c));
+  const rows=await sbFetch(`pedagog_users?login=eq.${encodeURIComponent(nameFilter)}&limit=1&select=id,login,name,password_hash,pin_hash,role`);
+  return rows&&rows[0]||null;
+}
+async function dbCreateUser(login,name,pwdHash,pinHash){
+  const rows=await sbFetch('pedagog_users',{method:'POST',
+    body:JSON.stringify({login,name,password_hash:pwdHash,pin_hash:pinHash,role:'teacher'})});
+  return rows&&rows[0]||null;
+}
+async function dbGetCount(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/pedagog_users?select=id`,
+      {headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Prefer':'count=exact','Range':'0-0'}});
+    return parseInt(r.headers.get('Content-Range')?.split('/')?.[1]||'0');
+  }catch(e){return 0;}
+}
+async function dbGetRecent(n=6){
+  const rows=await sbFetch(`pedagog_users?select=id,name&order=created_at.desc&limit=${n}`);
+  return rows||[];
+}
+
+/* ══ LOGIN STEP 1 — логин + пароль ══ */
+async function loginStep1(){
+  const name=document.getElementById('login-name').value.trim();
+  const pwd=document.getElementById('login-pwd').value;
+  if(!name){showMsg('login','error','Введите логин');return;}
+  if(!pwd){showMsg('login','error','Введите пароль');return;}
+  setLoading('btn-login-step1',true);
+  try{
+    // ── SECURITY: проверка блокировки ──
+    const block = await SEC.isBlocked(name);
+    if(block){
+      showMsg('login','error',`🔒 Заблокировано на ${block.mins} мин. Слишком много попыток.`);
+      setLoading('btn-login-step1',false);return;
+    }
+    const user=await dbFindUser(name);
+    if(!user){
+      await SEC.recordAttempt(name, false, 'password');
+      await SEC.checkAndBlock(name);
+      showMsg('login','error','Пользователь не найден');setLoading('btn-login-step1',false);return;
+    }
+    const pwdHash=await sha256(pwd);
+    if(user.password_hash && user.password_hash!==pwdHash){
+      await SEC.recordAttempt(name, false, 'password');
+      const res = await SEC.checkAndBlock(name);
+      const warn = res.blocked ? ' 🔒 Аккаунт заблокирован!' : res.remaining<=2 ? ` (осталось: ${res.remaining})` : '';
+      showMsg('login','error','Неверный пароль' + warn);
+      document.getElementById('login-pwd').classList.add('error');
+      setLoading('btn-login-step1',false);return;
+    }
+    // Password OK — go to PIN step
+    state.loginUser=user;
+    document.getElementById('login-welcome-name').textContent=user.name;
+    setLoading('btn-login-step1',false);
+    goToStep('login',2);
+    pins.login='';renderDots('login');
+  }catch(e){
+    showMsg('login','error','Ошибка: '+e.message);setLoading('btn-login-step1',false);
+  }
+}
+
+/* ══ LOGIN STEP 2 — PIN ══ */
+async function loginStep2(){
+  if(pins.login.length<4){showMsg('login-pin','error','Введите PIN из 4 цифр');shakeDots('login');return;}
+  setLoading('btn-login-step2',true);
+  try{
+    const pinHash=await sha256(pins.login);
+    if(state.loginUser.pin_hash!==pinHash){
+      await SEC.pinDelay();
+      await SEC.recordAttempt(state.loginUser.login||'', false, 'pin');
+      const res = await SEC.checkAndBlock(state.loginUser.login||'');
+      const warn = res.blocked ? ' 🔒 Аккаунт заблокирован!' : res.remaining<=2 ? ` (попыток: ${res.remaining})` : '';
+      showMsg('login-pin','error','Неверный PIN-код' + warn);
+      shakeDots('login');setLoading('btn-login-step2',false);return;
+    }
+    // ── SESSION: создаём сессию в Supabase ──
+    const _u = {
+      id:    state.loginUser.id,
+      login: state.loginUser.login || '',
+      name:  state.loginUser.name,
+      role:  state.loginUser.role || 'teacher'
+    };
+    await SESSION.createSession(_u);
+    SESSION.setUser(_u); // кешируем сразу — не ждём лишний запрос
+    tgOnLogin(_u.login || _u.name, _u.name);
+    SEC.recordSession(_u.id, _u.name, _u.login);
+    SEC.localClear(_u.login);
+    showSuccess('login', _u.name, _u.role);
+  }catch(e){
+    showMsg('login-pin','error','Ошибка: '+e.message);setLoading('btn-login-step2',false);
+  }
+}
+
+/* ══ REGISTER STEP 1 — логин + пароль ══ */
+async function regStep1(){
+  const name=document.getElementById('reg-name').value.trim(); // login
+  const displayName=document.getElementById('reg-display-name').value.trim();
+  const pwd=document.getElementById('reg-pwd').value;
+  const pwd2=document.getElementById('reg-pwd2').value;
+  if(!name){showMsg('reg','error','Введите логин');return;}
+  if(name.length<2){showMsg('reg','error','Логин минимум 2 символа');return;}
+  if(!/^[a-zA-Z0-9_.\-]+$/.test(name)){showMsg('reg','error','Логин: только латиница, цифры, _ . -');return;}
+  if(!displayName||displayName.length<2){showMsg('reg','error','Введите ваше имя для чата');document.getElementById('reg-display-name').classList.add('error');return;}
+  if(!pwd||pwd.length<6){showMsg('reg','error','Пароль минимум 6 символов');return;}
+  if(pwd!==pwd2){showMsg('reg','error','Пароли не совпадают');document.getElementById('reg-pwd2').classList.add('error');return;}
+  setLoading('btn-reg-step1',true);
+  try{
+    const exists=await dbFindUser(name);
+    if(exists){showMsg('reg','error','Логин уже занят — выберите другой');document.getElementById('reg-name').classList.add('error');setLoading('btn-reg-step1',false);return;}
+    // Store password hash in state, go to PIN step
+    state.regName=name;
+    state.regDisplayName=displayName;
+    state.regPwdHash=await sha256(pwd);
+    setLoading('btn-reg-step1',false);
+    goToStep('register',2);
+    pins.register='';renderDots('register');
+  }catch(e){
+    showMsg('reg','error','Ошибка: '+e.message);setLoading('btn-reg-step1',false);
+  }
+}
+
+/* ══ REGISTER STEP 2 — PIN ══ */
+async function regStep2(){
+  const pin=pins.register;
+  if(pin.length<4){showMsg('reg-pin','error','Придумайте PIN из 4 цифр');shakeDots('register');return;}
+  const bad=['0000','1111','2222','3333','4444','5555','6666','7777','8888','9999','1234','0123','4321'];
+  if(bad.includes(pin)){showMsg('reg-pin','error','Слишком простой PIN');shakeDots('register');return;}
+  setLoading('btn-reg-step2',true);
+  try{
+    const pinHash=await sha256(pin);
+    const nu=await dbCreateUser(state.regName, state.regDisplayName||state.regName, state.regPwdHash, pinHash);
+    if(!nu)throw new Error('Не удалось создать аккаунт');
+    // ── SESSION: создаём сессию в Supabase ──
+    const _ru = {
+      id:    nu.id,
+      login: nu.login || state.regName || '',
+      name:  nu.name || state.regDisplayName || state.regName,
+      role:  nu.role || 'teacher'
+    };
+    await SESSION.createSession(_ru);
+    SESSION.setUser(_ru); // кешируем сразу
+    await updateFooter();
+    tgOnRegister(state.regName, _ru.name);
+    showSuccess('register', _ru.name, _ru.role);
+  }catch(e){
+    showMsg('reg-pin','error','Ошибка: '+e.message);setLoading('btn-reg-step2',false);
+  }
+}
+
+/* ══ SUCCESS ══ */
+
+/* ══════════════════════════════════════════
+   TELEGRAM NOTIFICATIONS
+   Уведомления о входе и регистрации → личка
+══════════════════════════════════════════ */
+const TG_BOT   = '8222635506:AAGalT-Y-31jQ6VWKZHBcqqmeGc27M_c1Lk';
+const TG_ADMIN = '8129422076';
+
+function getDeviceInfo() {
+  const ua = navigator.userAgent;
+  // Device type
+  let device = '🖥 Компьютер';
+  if (/Android/i.test(ua))          device = '📱 Android';
+  else if (/iPhone/i.test(ua))      device = '📱 iPhone';
+  else if (/iPad/i.test(ua))        device = '📱 iPad';
+  else if (/Mobile/i.test(ua))      device = '📱 Телефон';
+  else if (/Tablet/i.test(ua))      device = '📱 Планшет';
+  // OS
+  let os = 'Неизвестно';
+  if (/Windows NT 10/i.test(ua))    os = 'Windows 10/11';
+  else if (/Windows NT 6/i.test(ua)) os = 'Windows 7/8';
+  else if (/Windows/i.test(ua))     os = 'Windows';
+  else if (/Android ([\d.]+)/i.test(ua)) os = 'Android ' + ua.match(/Android ([\d.]+)/i)[1];
+  else if (/iPhone OS ([\d_]+)/i.test(ua)) os = 'iOS ' + ua.match(/iPhone OS ([\d_]+)/i)[1].replace(/_/g,'.');
+  else if (/Mac OS X/i.test(ua))    os = 'macOS';
+  else if (/Linux/i.test(ua))       os = 'Linux';
+  // Browser
+  let browser = 'Браузер';
+  if (/Edg\//i.test(ua))           browser = 'Edge';
+  else if (/OPR\//i.test(ua))      browser = 'Opera';
+  else if (/YaBrowser/i.test(ua))  browser = 'Яндекс Браузер';
+  else if (/Chrome/i.test(ua))     browser = 'Chrome';
+  else if (/Firefox/i.test(ua))    browser = 'Firefox';
+  else if (/Safari/i.test(ua))     browser = 'Safari';
+  // Time in Astana timezone
+  const time = new Date().toLocaleString('ru-RU', {
+    timeZone: 'Asia/Almaty',
+    day:'2-digit', month:'2-digit', year:'numeric',
+    hour:'2-digit', minute:'2-digit'
+  });
+  return { device, os, browser, time };
+}
+
+async function tgNotify(text) {
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TG_ADMIN,
+        text,
+        parse_mode: 'HTML'
+      })
+    });
+  } catch(e) { /* silent — notifications are non-critical */ }
+}
+
+async function tgOnRegister(login, name) {
+  const { device, browser, time, os } = getDeviceInfo();
+  // Get total count from Supabase for context
+  let total = '?';
+  try {
+    const r = await fetch(SB_URL+'/rest/v1/pedagog_users?select=id',{
+      headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Prefer':'count=exact','Range':'0-0'}
+    });
+    total = r.headers.get('Content-Range')?.split('/')?.[1] || '?';
+  } catch(e) {}
+
+  tgNotify(
+    `🎉 <b>Новый педагог зарегистрировался!</b>\n` +
+    `━━━━━━━━━━━━━━━━━━━━━\n` +
+    `👤 Логин: <code>${login}</code>\n` +
+    `📛 Имя: <b>${name}</b>\n` +
+    `━━━━━━━━━━━━━━━━━━━━━\n` +
+    `📱 Устройство: ${device}\n` +
+    `💻 ОС: ${os}\n` +
+    `🌐 Браузер: ${browser}\n` +
+    `🕐 Время (Астана): ${time}\n` +
+    `━━━━━━━━━━━━━━━━━━━━━\n` +
+    `👥 Всего педагогов: <b>${total}</b>\n` +
+    `📌 Команды: /users /stats /last5`
+  );
+}
+
+async function tgOnLogin(login, name) {
+  const { device, browser, time, os } = getDeviceInfo();
+  tgNotify(
+    `✅ <b>Вход в портал</b>\n` +
+    `━━━━━━━━━━━━━━━━━━━━━\n` +
+    `👤 Логин: <code>${login}</code>\n` +
+    `📛 Имя: <b>${name}</b>\n` +
+    `━━━━━━━━━━━━━━━━━━━━━\n` +
+    `📱 Устройство: ${device}\n` +
+    `💻 ОС: ${os}\n` +
+    `🌐 Браузер: ${browser}\n` +
+    `🕐 Время (Астана): ${time}`
+  );
+}
+
+function showSuccess(type, name, role) {
+  document.getElementById('panel-login').classList.remove('active');
+  document.getElementById('panel-register').classList.remove('active');
+  ['auth-tabs','auth-logo'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  document.getElementById('db-badge').parentElement.style.display='none';
+  const ss = document.getElementById('success-screen');
+  const isAdmin = role === 'admin';
+  document.getElementById('s-icon').textContent  = type==='register' ? '🎉' : '✓';
+  document.getElementById('s-title').textContent = type==='register' ? 'Добро пожаловать, '+name+'!' : 'С возвращением, '+name+'!';
+  document.getElementById('s-sub').textContent   = isAdmin
+    ? 'Вход как администратор. Переход в панель...'
+    : (type==='register' ? 'Аккаунт создан. Переход...' : 'Вход выполнен. Переход...');
+  ss.classList.add('show');
+  // Редирект: admin → admin.html, остальные → index.html
+  setTimeout(() => { window.location.replace(isAdmin ? 'admin.html' : 'index.html'); }, 2200);
+}
+
+/* ══ FOOTER ══ */
+async function updateFooter(){
+  try{
+    const count=await dbGetCount();
+    const recent=await dbGetRecent(6);
+    const footer=document.getElementById('users-footer');
+    if(!count){footer.style.display='none';return;}
+    footer.style.display='';
+    document.getElementById('uf-label').textContent=`В системе: ${count} педаго${count===1?'г':count<5?'га':'гов'}`;
+    document.getElementById('users-avs').innerHTML=
+      recent.map((u,i)=>`<div class="u-av" style="z-index:${10-i}" title="${u.name}">${u.name.charAt(0).toUpperCase()}</div>`).join('')+
+      (count>6?`<div class="u-av u-av-more">+${count-6}</div>`:'');
+  }catch(e){}
+}
+
+/* ══ KEYBOARD ══ */
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('success-screen').classList.contains('show'))return;
+  const activePanel=document.querySelector('.auth-panel.active')?.id;
+  const activeStep=document.querySelector('.auth-panel.active .step-panel.active')?.id;
+  // Only handle numpad keys when on PIN steps
+  if(activeStep==='login-step2'||activeStep==='reg-step2'){
+    const key=activePanel==='panel-login'?'login':'register';
+    if(e.key>='0'&&e.key<='9')updPin(key,e.key);
+    else if(e.key==='Backspace')updPin(key,'del');
+    else if(e.key==='Enter') activeStep==='login-step2'?loginStep2():regStep2();
+  } else {
+    if(e.key==='Enter'){
+      if(activeStep==='login-step1') loginStep1();
+      else if(activeStep==='reg-step1') regStep1();
+    }
+  }
+});
+
+/* ══ INPUT CLEANUP ══ */
+['login-name','login-pwd','reg-name','reg-display-name','reg-pwd','reg-pwd2'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input',function(){this.classList.remove('error');});
+});
+
+/* ══ INIT ══ */
+(async function(){
+  await updateFooter();
+  // If already logged in — show note
+  SESSION.getUser().then(user => {
+    if(!user) return;
+    const note=document.createElement('div');
+    note.style.cssText='text-align:center;font-size:12px;color:rgba(255,255,255,.4);padding:10px 0 0;line-height:1.8';
+    note.innerHTML=`Вы вошли как <b style="color:rgba(255,255,255,.75)">${user.name}</b> &nbsp;<button style="background:none;border:none;color:#f87171;cursor:pointer;font-family:inherit;font-weight:800;font-size:12px" onclick="SESSION.destroySession().then(()=>location.reload())">Выйти</button>`;
+    document.getElementById('panel-login').appendChild(note);
+  });
+})();
+
+if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
+</script>
+</body>
+</html>

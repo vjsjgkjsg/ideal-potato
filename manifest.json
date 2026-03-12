@@ -1,0 +1,22 @@
+{
+  "name": "Цифровой навигатор педагога",
+  "short_name": "Навигатор",
+  "description": "Профессиональный портал педагогов СКО",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0b1421",
+  "theme_color": "#1976d2",
+  "orientation": "portrait-primary",
+  "lang": "ru",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    { "name": "Чат", "url": "/chat.html", "icons": [{"src":"icon-192.png","sizes":"192x192"}] },
+    { "name": "Материалы", "url": "/index.html#metodichka", "icons": [{"src":"icon-192.png","sizes":"192x192"}] },
+    { "name": "Игры", "url": "/games.html", "icons": [{"src":"icon-192.png","sizes":"192x192"}] }
+  ]
+}
